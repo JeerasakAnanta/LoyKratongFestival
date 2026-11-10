@@ -51,6 +51,12 @@ export default function Home() {
               ดูจุดลอยกระทงทั่วไทย
             </Link>
             <Link
+              href="/float"
+              className="rounded-full border border-amber-300/40 px-6 py-3 font-medium text-amber-200 transition hover:bg-amber-300/10"
+            >
+              ลอยกระทงออนไลน์ 🪷
+            </Link>
+            <Link
               href="/about"
               className="rounded-full border border-white/25 px-6 py-3 font-medium text-white transition hover:bg-white/10"
             >

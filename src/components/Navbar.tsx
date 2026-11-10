@@ -3,6 +3,7 @@ import Link from "next/link";
 const NAV_LINKS = [
   { href: "/", label: "หน้าแรก" },
   { href: "/events", label: "จุดลอยกระทง" },
+  { href: "/float", label: "ลอยกระทงออนไลน์" },
   { href: "/about", label: "ประวัติและความเชื่อ" },
   { href: "/contact", label: "ติดต่อ" },
 ];

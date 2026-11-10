@@ -46,3 +46,35 @@
   --input: 240 3.7% 15.9%;
   --ring: 346.4 77.2% 49.8%;
 }
+
+/* ลอยกระทงออนไลน์ (/float) */
+@keyframes river-drift {
+  from { transform: translateX(-12%); opacity: 0; }
+  6% { opacity: 1; }
+  88% { opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+@keyframes river-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(5px) rotate(3deg); }
+}
+@keyframes river-flame {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25, 0.9); opacity: 0.8; }
+}
+@keyframes river-wave {
+  from { background-position-x: 0; }
+  to { background-position-x: 200px; }
+}
+.river-drift { animation: river-drift var(--dur, 25s) linear forwards; }
+.river-bob { animation: river-bob 3s ease-in-out infinite; }
+.river-flame { animation: river-flame 0.9s ease-in-out infinite; }
+.river-wave {
+  background-image: repeating-radial-gradient(circle at 50% 120%, transparent 0 14px, rgba(255, 255, 255, 0.07) 15px 16px);
+  background-size: 100px 24px;
+  animation: river-wave 6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .river-drift, .river-bob, .river-flame, .river-wave { animation: none; }
+  .river-drift { transform: translateX(var(--rest, 40%)); }
+}
