@@ -74,9 +74,20 @@
   background-size: 100px 24px;
   animation: river-wave 6s linear infinite;
 }
+@keyframes river-fade {
+  from { opacity: 0; }
+  6% { opacity: 1; }
+  88% { opacity: 1; }
+  to { opacity: 0; }
+}
+/* ชี้หรือโฟกัสกระทงแล้วหยุดลอย เพื่อให้อ่านคำอธิษฐานได้ทัน */
+.river-drift:has(.river-bob:hover, .river-bob:focus) { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .river-drift, .river-bob, .river-flame, .river-wave { animation: none; }
-  .river-drift { transform: translateX(var(--rest, 40%)); }
+  .river-bob, .river-flame, .river-wave { animation: none; }
+  .river-drift {
+    animation: river-fade var(--dur, 25s) linear forwards;
+    transform: translateX(var(--rest, 40%));
+  }
 }
 
 /* ระบบดีไซน์: มนต์ขลังยามค่ำ */

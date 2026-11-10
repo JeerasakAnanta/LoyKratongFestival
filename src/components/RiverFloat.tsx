@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 const STYLES = [
   { id: "lotus", emoji: "🪷", label: "ดอกบัว" },
@@ -16,6 +16,7 @@ interface Floating {
   emoji: string;
   wish: string;
   top: number;
+  rest: number;
   duration: number;
 }
 
@@ -25,6 +26,15 @@ export default function RiverFloat() {
   const [wish, setWish] = useState("");
   const [style, setStyle] = useState<(typeof STYLES)[number]["id"]>("lotus");
   const [items, setItems] = useState<Floating[]>([]);
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const [announce, setAnnounce] = useState("");
+  const wishRef = useRef<HTMLTextAreaElement>(null);
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach(window.clearTimeout);
+  }, []);
 
   function release(e: FormEvent) {
     e.preventDefault();
@@ -36,14 +46,25 @@ export default function RiverFloat() {
       emoji,
       wish: text,
       top: 35 + Math.random() * 45,
+      rest: 5 + Math.random() * 60,
       duration: 22 + Math.random() * 10,
     };
     setItems((prev) => [...prev.slice(-(MAX_ON_RIVER - 1)), item]);
     setWish("");
+    setAnnounce(`ลอยกระทงแล้ว: ${text}`);
+    wishRef.current?.focus();
+    // ลบด้วย timer แทน onAnimationEnd เพราะโหมดลดการเคลื่อนไหวปิด animation
+    timers.current.push(
+      window.setTimeout(() => remove(item.id), item.duration * 1000),
+    );
   }
 
-  const remove = (id: number) =>
+  function remove(id: number) {
     setItems((prev) => prev.filter((i) => i.id !== id));
+    setActiveId((cur) => (cur === id ? null : cur));
+  }
+
+  const active = items.find((i) => i.id === activeId);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
@@ -91,6 +112,7 @@ export default function RiverFloat() {
           </label>
           <textarea
             id="wish"
+            ref={wishRef}
             value={wish}
             onChange={(e) => setWish(e.target.value)}
             maxLength={MAX_WISH}
@@ -106,7 +128,7 @@ export default function RiverFloat() {
         <button
           type="submit"
           disabled={!wish.trim()}
-          className="w-full btn-gold w-full disabled:cursor-not-allowed disabled:opacity-40"
+          className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-40"
         >
           ลอยกระทง
         </button>
@@ -115,6 +137,7 @@ export default function RiverFloat() {
       <div
         role="region"
         aria-label="แม่น้ำจำลอง"
+        onKeyDown={(e) => e.key === "Escape" && setActiveId(null)}
         className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#120d33] via-[#1c1245] to-[#0b1a33]"
       >
         <div
@@ -125,6 +148,14 @@ export default function RiverFloat() {
           className="river-wave absolute inset-x-0 bottom-0 top-[30%] bg-gradient-to-b from-[#12305a]/80 to-[#071428]"
           aria-hidden="true"
         />
+        <p role="status" className="sr-only">
+          {announce}
+        </p>
+        {active && (
+          <p className="absolute inset-x-4 top-4 z-10 max-w-[70%] rounded-xl bg-black/70 p-3 text-sm text-gold">
+            {active.wish}
+          </p>
+        )}
         {items.length === 0 && (
           <p className="absolute inset-x-0 top-1/2 text-center text-sm text-gray-400">
             เขียนคำอธิษฐานแล้วกด “ลอยกระทง”
@@ -135,14 +166,22 @@ export default function RiverFloat() {
             key={it.id}
             className="river-drift pointer-events-none absolute left-0 w-full"
             style={
-              { top: `${it.top}%`, "--dur": `${it.duration}s` } as React.CSSProperties
+              {
+                top: `${it.top}%`,
+                "--dur": `${it.duration}s`,
+                "--rest": `${it.rest}%`,
+              } as React.CSSProperties
             }
-            onAnimationEnd={() => remove(it.id)}
           >
             <div
               tabIndex={0}
+              role="group"
               aria-label={`กระทง คำอธิษฐาน: ${it.wish}`}
-              className="river-bob group pointer-events-auto relative inline-block w-24 text-center focus:outline-none"
+              onMouseEnter={() => setActiveId(it.id)}
+              onMouseLeave={() => setActiveId(null)}
+              onFocus={() => setActiveId(it.id)}
+              onBlur={() => setActiveId(null)}
+              className="river-bob pointer-events-auto relative inline-block w-24 rounded-lg text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
             >
               <span className="river-flame absolute -top-1 left-1/2 -translate-x-1/2 text-lg" aria-hidden="true">
                 🔥
@@ -150,10 +189,10 @@ export default function RiverFloat() {
               <span className="block text-5xl" aria-hidden="true">
                 {it.emoji}
               </span>
-              <span className="mx-auto mt-1 block max-w-[6rem] truncate rounded bg-black/50 px-1.5 text-[11px] text-amber-100 group-hover:hidden group-focus:hidden">
-                {it.wish}
-              </span>
-              <span className="absolute left-1/2 top-full z-10 mt-1 hidden w-48 -translate-x-1/2 rounded-lg bg-black/80 p-2 text-xs text-amber-100 group-hover:block group-focus:block">
+              <span
+                aria-hidden="true"
+                className="mx-auto mt-1 block max-w-[6rem] truncate rounded bg-black/50 px-1.5 text-[11px] text-gold"
+              >
                 {it.wish}
               </span>
             </div>
