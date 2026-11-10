@@ -1,5 +1,6 @@
 import Link from "next/link";
-import Lantern from "@/components/Lantern";
+import RiverFloat from "@/components/RiverFloat";
+import RiverScene from "@/components/RiverScene";
 import {
   FESTIVAL_DATE_DISPLAY,
   FESTIVAL_EVENTS,
@@ -30,12 +31,12 @@ export default function Home() {
   return (
     <main>
       {/* Hero */}
-      <section className="night-sky relative overflow-hidden">
+      <section className="night-sky relative overflow-hidden pb-56 sm:pb-64">
         <div
           className="moon-glow absolute right-[8%] top-10 h-16 w-16 rounded-full sm:h-24 sm:w-24"
           aria-hidden="true"
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+        <div className="relative z-10 mx-auto max-w-6xl px-4 pb-6 pt-16 text-center sm:pt-24">
           <p className="mb-6 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm text-gold">
             {FESTIVAL_DATE_DISPLAY}
           </p>
@@ -68,14 +69,28 @@ export default function Home() {
             </Link>
           </div>
         </div>
+        <div className="absolute inset-x-0 bottom-0 h-56 sm:h-64">
+          <RiverScene />
+        </div>
       </section>
 
-      {/* แอนิเมชัน */}
+      {/* ลอยกระทงออนไลน์ */}
       <section className="mx-auto max-w-6xl px-4 py-14">
-        <h2 className="mb-4 section-title">
-          บรรยากาศคืนลอยกระทง
-        </h2>
-        <Lantern />
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          <div>
+            <h2 className="section-title">ลอยกระทงออนไลน์</h2>
+            <p className="mt-2 text-gray-300">
+              เขียนคำอธิษฐาน เลือกกระทง แล้วปล่อยให้ลอยไปตามสายน้ำ
+            </p>
+          </div>
+          <Link
+            href="/float"
+            className="text-sm text-gold underline-offset-4 hover:underline"
+          >
+            เปิดเต็มหน้า
+          </Link>
+        </div>
+        <RiverFloat />
       </section>
 
       {/* จุดลอยเด่น */}

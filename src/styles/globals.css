@@ -127,3 +127,16 @@
   background: radial-gradient(circle at 40% 40%, #fff7dd, #f2c46d 70%);
   box-shadow: 0 0 80px 24px rgba(242, 196, 109, 0.35);
 }
+
+/* ฉากฮีโร่ (RiverScene) */
+@keyframes scene-ripple { to { transform: translateX(-80px); } }
+@keyframes scene-kratong {
+  0% { transform: translateX(0); opacity: 0; }
+  10%, 85% { opacity: 1; }
+  100% { transform: translateX(420px); opacity: 0; }
+}
+.scene-ripple { animation: scene-ripple 6s linear infinite; }
+.scene-kratong { animation: scene-kratong 28s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .scene-ripple, .scene-kratong { animation: none; opacity: 1; }
+}
