@@ -11,21 +11,21 @@ export default function ContactPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">ติดต่อเรา</h1>
+        <h1 className="page-title">ติดต่อเรา</h1>
         <p className="mt-3 max-w-2xl leading-relaxed text-gray-300">
           เห็นข้อมูลจุดลอยกระทงที่ควรอัปเดต หรืออยากแนะนำจุดลอยที่ยังไม่มีในเว็บ
           เขียนมาได้เลย
         </p>
       </header>
 
-      <section className="mb-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="mb-3 text-xl font-bold text-white">ช่องทางติดต่อ</h2>
+      <section className="mb-10 card p-6">
+        <h2 className="mb-3 font-serif text-xl font-bold text-white">ช่องทางติดต่อ</h2>
         <ul className="space-y-2 text-gray-300">
           <li>
             อีเมล:{" "}
             <a
               href="mailto:hello@loykratong.example"
-              className="text-amber-300 underline-offset-4 hover:underline"
+              className="text-gold underline-offset-4 hover:underline"
             >
               hello@loykratong.example
             </a>
@@ -40,7 +40,7 @@ export default function ContactPage() {
       </section>
 
       <section>
-        <h2 className="mb-6 text-xl font-bold text-white">
+        <h2 className="mb-6 font-serif text-xl font-bold text-white">
           สรุปพิกัดจุดลอยกระทง
         </h2>
         <div className="overflow-x-auto rounded-2xl border border-white/10">
@@ -79,7 +79,7 @@ export default function ContactPage() {
                       href={event.mapUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-amber-300 underline-offset-4 hover:underline"
+                      className="text-gold underline-offset-4 hover:underline"
                     >
                       เปิดแผนที่
                     </a>

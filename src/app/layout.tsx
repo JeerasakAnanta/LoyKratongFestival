@@ -1,8 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Sans_Thai, Noto_Serif_Thai } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FESTIVAL_DATE_DISPLAY } from "@/lib/festival-data";
 import "@/styles/globals.css";
+
+const sans = Noto_Sans_Thai({
+  subsets: ["thai", "latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+const serif = Noto_Serif_Thai({
+  subsets: ["thai", "latin"],
+  weight: ["600", "700"],
+  variable: "--font-serif",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +55,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f0f1a",
+  themeColor: "#0a0920",
   colorScheme: "dark",
 };
 
@@ -52,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="th">
+    <html lang="th" className={`${sans.variable} ${serif.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
@@ -78,7 +91,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-screen flex-col bg-charcoal text-gray-100 antialiased">
+      <body className="flex min-h-screen flex-col bg-night font-sans text-gray-100 antialiased">
         <Navbar />
         {children}
         <Footer />

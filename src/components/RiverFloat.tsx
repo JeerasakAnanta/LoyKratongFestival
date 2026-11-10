@@ -49,10 +49,10 @@ export default function RiverFloat() {
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
       <form
         onSubmit={release}
-        className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5"
+        className="space-y-4 card p-5"
       >
         <fieldset>
-          <legend className="mb-2 text-sm font-medium text-amber-200">
+          <legend className="mb-2 text-sm font-medium text-gold">
             เลือกกระทง
           </legend>
           <div className="flex gap-2">
@@ -61,7 +61,7 @@ export default function RiverFloat() {
                 key={s.id}
                 className={`flex-1 cursor-pointer rounded-xl border px-2 py-3 text-center text-sm transition ${
                   style === s.id
-                    ? "border-amber-400 bg-amber-400/10 text-white"
+                    ? "border-gold bg-gold/10 text-white"
                     : "border-white/10 text-gray-300 hover:bg-white/5"
                 }`}
               >
@@ -85,7 +85,7 @@ export default function RiverFloat() {
         <div>
           <label
             htmlFor="wish"
-            className="mb-2 block text-sm font-medium text-amber-200"
+            className="mb-2 block text-sm font-medium text-gold"
           >
             คำอธิษฐาน
           </label>
@@ -96,7 +96,7 @@ export default function RiverFloat() {
             maxLength={MAX_WISH}
             rows={4}
             placeholder="ขอให้ปีหน้าสุขภาพแข็งแรง..."
-            className="w-full resize-none rounded-xl border border-white/10 bg-charcoal p-3 text-white placeholder:text-gray-500 focus:border-amber-400 focus:outline-none"
+            className="w-full resize-none rounded-xl border border-white/10 bg-night p-3 text-white placeholder:text-gray-500 focus:border-gold focus:outline-none"
           />
           <p className="mt-1 text-right text-xs text-gray-400">
             {wish.length}/{MAX_WISH}
@@ -106,7 +106,7 @@ export default function RiverFloat() {
         <button
           type="submit"
           disabled={!wish.trim()}
-          className="w-full rounded-full bg-amber-500 px-5 py-2.5 font-medium text-gray-900 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+          className="w-full btn-gold w-full disabled:cursor-not-allowed disabled:opacity-40"
         >
           ลอยกระทง
         </button>
@@ -115,10 +115,10 @@ export default function RiverFloat() {
       <div
         role="region"
         aria-label="แม่น้ำจำลอง"
-        className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#1b1440] via-[#241646] to-[#0b1a33]"
+        className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#120d33] via-[#1c1245] to-[#0b1a33]"
       >
         <div
-          className="absolute right-8 top-6 h-14 w-14 rounded-full bg-amber-100 shadow-[0_0_60px_20px_rgba(253,230,138,0.35)]"
+          className="absolute right-8 top-6 h-14 w-14 rounded-full moon-glow"
           aria-hidden="true"
         />
         <div

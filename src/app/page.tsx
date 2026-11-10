@@ -8,17 +8,17 @@ import {
 
 const TIPS = [
   {
-    icon: "🍃",
+    icon: "M5 19c0-8 5-13 14-14 0 9-5 14-14 14Zm0 0 8-8",
     title: "เลือกกระทงวัสดุธรรมชาติ",
     body: "กระทงที่ทำจากใบตอง ก้านกล้วย และดอกไม้จะย่อยสลายเองได้ ส่วนโฟมและพลาสติกจะตกค้างในแม่น้ำเป็นเวลานาน",
   },
   {
-    icon: "🕯️",
+    icon: "M12 3c1.5 2.2 1.5 4 0 5.5C10.5 7 10.5 5.2 12 3ZM9 11h6v10H9z",
     title: "ใช้เทียนและธูปให้พอดี",
     body: "จุดเทียนหนึ่งเล่มพอ เพราะคืนลอยกระทงมีควันและเศษเทียนหล่นลงน้ำเป็นจำนวนมาก",
   },
   {
-    icon: "🧺",
+    icon: "M4 10h16l-1.5 10h-13L4 10Zm4 0 3-6m5 6-3-6",
     title: "ช่วยกันเก็บขยะริมน้ำ",
     body: "หลังจบงานแต่ละปีมีกระทงและขยะตกค้างริมแม่น้ำจำนวนมาก เห็บอะไรกลับบ้านได้ ช่วยกันเก็บได้ ก็ช่วยแม่น้ำไว้หนึ่งชีวิต",
   },
@@ -30,12 +30,16 @@ export default function Home() {
   return (
     <main>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#1b1440] via-[#241646] to-charcoal">
-        <div className="mx-auto max-w-6xl px-4 py-20 text-center sm:py-28">
-          <p className="mb-6 inline-block rounded-full border border-amber-300/30 bg-amber-300/10 px-4 py-1.5 text-sm text-amber-200">
+      <section className="night-sky relative overflow-hidden">
+        <div
+          className="moon-glow absolute right-[8%] top-10 h-16 w-16 rounded-full sm:h-24 sm:w-24"
+          aria-hidden="true"
+        />
+        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center sm:py-32">
+          <p className="mb-6 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm text-gold">
             {FESTIVAL_DATE_DISPLAY}
           </p>
-          <h1 className="text-4xl font-bold leading-tight text-white sm:text-6xl">
+          <h1 className="font-serif text-5xl font-bold leading-tight text-white sm:text-7xl">
             ลอยกระทง 2569
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-gray-300">
@@ -46,19 +50,19 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/events"
-              className="rounded-full bg-amber-500 px-6 py-3 font-medium text-gray-900 transition hover:bg-amber-400"
+              className="btn-gold"
             >
               ดูจุดลอยกระทงทั่วไทย
             </Link>
             <Link
               href="/float"
-              className="rounded-full border border-amber-300/40 px-6 py-3 font-medium text-amber-200 transition hover:bg-amber-300/10"
+              className="btn-ghost"
             >
-              ลอยกระทงออนไลน์ 🪷
+              ลอยกระทงออนไลน์
             </Link>
             <Link
               href="/about"
-              className="rounded-full border border-white/25 px-6 py-3 font-medium text-white transition hover:bg-white/10"
+              className="btn-ghost"
             >
               รู้จักประวัติลอยกระทง
             </Link>
@@ -68,7 +72,7 @@ export default function Home() {
 
       {/* แอนิเมชัน */}
       <section className="mx-auto max-w-6xl px-4 py-14">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+        <h2 className="mb-4 section-title">
           บรรยากาศคืนลอยกระทง
         </h2>
         <Lantern />
@@ -77,10 +81,10 @@ export default function Home() {
       {/* จุดลอยเด่น */}
       <section className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-6 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-bold text-white">จุดลอยกระทงเด่น</h2>
+          <h2 className="section-title">จุดลอยกระทงเด่น</h2>
           <Link
             href="/events"
-            className="text-sm text-amber-300 underline-offset-4 hover:underline"
+            className="text-sm text-gold underline-offset-4 hover:underline"
           >
             ดูทั้งหมด
           </Link>
@@ -90,17 +94,17 @@ export default function Home() {
             <Link
               key={event.id}
               href={`/events#${event.id}`}
-              className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-amber-300/40 hover:bg-white/10"
+              className="group card p-5 transition hover:border-gold/50 hover:bg-white/[0.08]"
             >
               <div className="flex items-baseline justify-between gap-2">
                 <h3 className="text-lg font-semibold text-white">
                   {event.city}
                 </h3>
-                <span className="rounded-full bg-purple-500/20 px-3 py-0.5 text-xs text-purple-200">
+                <span className="rounded-full bg-gold/10 px-3 py-0.5 text-xs text-gold">
                   {CATEGORY_LABELS[event.category]}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-amber-200">{event.venue}</p>
+              <p className="mt-1 text-sm text-gold">{event.venue}</p>
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-300">
                 {event.description}
               </p>
@@ -112,18 +116,26 @@ export default function Home() {
 
       {/* เคล็ดลับ */}
       <section className="mx-auto max-w-6xl px-4 py-10">
-        <h2 className="mb-6 text-2xl font-bold text-white">
+        <h2 className="mb-6 section-title">
           ลอยกระทงอย่างรักษ์แม่น้ำ
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
           {TIPS.map((tip) => (
             <div
               key={tip.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              className="card p-5"
             >
-              <span className="text-2xl" aria-hidden="true">
-                {tip.icon}
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-7 w-7 text-gold"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d={tip.icon} />
+              </svg>
               <h3 className="mt-3 font-semibold text-white">{tip.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-300">
                 {tip.body}
@@ -135,11 +147,11 @@ export default function Home() {
 
       {/* บทอธิษฐาน */}
       <section className="mx-auto max-w-6xl px-4 py-10">
-        <div className="rounded-2xl border border-amber-300/20 bg-gradient-to-br from-[#2a1f50] to-charcoal p-8 text-center">
-          <h2 className="mb-4 text-2xl font-bold text-white">
+        <div className="rounded-2xl border border-gold/25 bg-gradient-to-br from-[#2a1f50] to-night p-8 text-center">
+          <h2 className="mb-4 section-title">
             บทอธิษฐานก่อนลอยกระทง
           </h2>
-          <blockquote className="mx-auto max-w-2xl italic leading-loose text-amber-100/90">
+          <blockquote className="mx-auto max-w-2xl italic leading-loose text-gold/90">
             &ldquo;ข้าวบูชาพระแม่คงคา เทวดาประจำลำน้ำ
             ที่ได้บำรุงชีวิตข้าพเจ้าตลอดฤดูกาล
             ขอให้ข้าพเจ้าและครอบครัวมีความสุขความเจริญ

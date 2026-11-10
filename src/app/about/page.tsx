@@ -33,7 +33,7 @@ export default function AboutPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">
+        <h1 className="page-title">
           เรื่องของลอยกระทง
         </h1>
         <p className="mt-3 max-w-2xl leading-relaxed text-gray-300">
@@ -42,8 +42,8 @@ export default function AboutPage() {
         </p>
       </header>
 
-      <section className="mb-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="mb-4 text-2xl font-bold text-white">ที่มาของประเพณี</h2>
+      <section className="mb-10 card p-6">
+        <h2 className="mb-4 section-title">ที่มาของประเพณี</h2>
         <div className="space-y-4 leading-relaxed text-gray-300">
           <p>
             ตำนานที่คนไทยเล่าต่อกันคือเรื่องนางนพมาศ นางกำนัลผู้เลอโฉมในราชสำนักสุโขทัย
@@ -66,16 +66,16 @@ export default function AboutPage() {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-6 text-2xl font-bold text-white">
+        <h2 className="mb-6 section-title">
           คนลอยกระทงเพื่ออะไร
         </h2>
         <div className="grid gap-4 md:grid-cols-3">
           {MEANINGS.map((item) => (
             <div
               key={item.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              className="card p-5"
             >
-              <h3 className="font-semibold text-amber-200">{item.title}</h3>
+              <h3 className="font-semibold text-gold">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-300">
                 {item.body}
               </p>
@@ -84,8 +84,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mb-10 rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h2 className="mb-4 text-2xl font-bold text-white">
+      <section className="mb-10 card p-6">
+        <h2 className="mb-4 section-title">
           ทำกระทงเองจากวัสดุธรรมชาติ
         </h2>
         <ol className="list-decimal space-y-3 pl-5 leading-relaxed text-gray-300">
@@ -99,13 +99,13 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="rounded-2xl border border-amber-300/20 bg-gradient-to-br from-[#2a1f50] to-charcoal p-6 text-center">
+      <section className="rounded-2xl border border-gold/25 bg-gradient-to-br from-[#2a1f50] to-night p-6 text-center">
         <p className="text-gray-300">
           อยากไปลอยกระทงกับคนจำนวนมาก หรือชอบบรรยากาศเมืองเก่า?
         </p>
         <Link
           href="/events"
-          className="mt-3 inline-block rounded-full bg-amber-500 px-5 py-2 text-sm font-medium text-gray-900 transition hover:bg-amber-400"
+          className="mt-3 inline-block btn-gold"
         >
           เลือกจุดลอยกระทง
         </Link>

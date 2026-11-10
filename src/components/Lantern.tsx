@@ -225,7 +225,7 @@ export default function Lantern() {
           type="button"
           onClick={toggle}
           aria-pressed={isPlaying}
-          className="rounded-full bg-amber-500/90 px-5 py-2 font-medium text-gray-900 transition hover:bg-amber-400 disabled:opacity-50"
+          className="btn-gold disabled:opacity-50"
         >
           {isPlaying ? "หยุดชั่วคราว" : "เล่นแอนิเมชัน"}
         </button>
