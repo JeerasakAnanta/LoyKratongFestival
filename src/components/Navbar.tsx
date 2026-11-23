@@ -14,7 +14,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gold/15 bg-night/85 text-white backdrop-blur">
+    <header className="sm:sticky top-0 z-40 border-b border-gold/15 bg-night/85 text-white backdrop-blur">
       <nav
         aria-label="เมนูหลัก"
         className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3"
@@ -30,7 +30,8 @@ export default function Navbar() {
 
         <ul className="flex flex-wrap items-center gap-1">
           {NAV_LINKS.map((link) => {
-            const active = pathname === link.href;
+            const active =
+              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <li key={link.href}>
                 <Link

@@ -21,7 +21,7 @@ const TIPS = [
   {
     icon: "M4 10h16l-1.5 10h-13L4 10Zm4 0 3-6m5 6-3-6",
     title: "ช่วยกันเก็บขยะริมน้ำ",
-    body: "หลังจบงานแต่ละปีมีกระทงและขยะตกค้างริมแม่น้ำจำนวนมาก เห็บอะไรกลับบ้านได้ ช่วยกันเก็บได้ ก็ช่วยแม่น้ำไว้หนึ่งชีวิต",
+    body: "หลังจบงานแต่ละปีมีกระทงและขยะตกค้างริมแม่น้ำจำนวนมาก เก็บอะไรกลับบ้านได้ ช่วยกันเก็บได้ ก็ช่วยแม่น้ำไว้หนึ่งชีวิต",
   },
 ];
 
@@ -123,7 +123,7 @@ export default function Home() {
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-300">
                 {event.description}
               </p>
-              <p className="mt-3 text-xs text-gray-500">{event.dateDisplay}</p>
+              <p className="mt-3 text-xs text-gray-300">{event.dateDisplay}</p>
             </Link>
           ))}
         </div>
@@ -170,7 +170,7 @@ export default function Home() {
             &ldquo;ข้าวบูชาพระแม่คงคา เทวดาประจำลำน้ำ
             ที่ได้บำรุงชีวิตข้าพเจ้าตลอดฤดูกาล
             ขอให้ข้าพเจ้าและครอบครัวมีความสุขความเจริญ
-            ทุกข์โทษโรคภัยทั้งหลายจงล่อยไปกับกระทงนี้&rdquo;
+            ทุกข์โทษโรคภัยทั้งหลายจงลอยไปกับกระทงนี้&rdquo;
           </blockquote>
           <p className="mt-4 text-sm text-gray-400">
             ปรับใช้ได้ตามสบายใจ สำคัญที่ใจที่ขอบคุณแม่น้ำ

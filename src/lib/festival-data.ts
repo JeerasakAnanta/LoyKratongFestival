@@ -1,4 +1,4 @@
-export type EventCategory = "river" | "historical" | "lantern" | "sea";
+export type EventCategory = "river" | "historical" | "lantern";
 
 export interface FestivalEvent {
   id: string;
@@ -18,7 +18,7 @@ export const FESTIVAL_DATE = "2026-11-24";
 
 export const FESTIVAL_DATE_DISPLAY = "วันอังคารที่ 24 พฤศจิกายน 2026";
 
-export const FESTIVAL_EVENTS: FestivalEvent[] = [
+const EVENTS: Omit<FestivalEvent, "mapUrl">[] = [
   {
     id: "bangkok",
     city: "กรุงเทพฯ",
@@ -31,7 +31,6 @@ export const FESTIVAL_EVENTS: FestivalEvent[] = [
     category: "river",
     lat: 13.7589,
     lng: 100.4977,
-    mapUrl: "https://maps.google.com/?q=สะพานพระราม 8",
   },
   {
     id: "sukhothai",
@@ -45,7 +44,6 @@ export const FESTIVAL_EVENTS: FestivalEvent[] = [
     category: "historical",
     lat: 17.0209,
     lng: 99.7036,
-    mapUrl: "https://maps.google.com/?q=อุทยานประวัติศาสตร์สุโขทัย",
   },
   {
     id: "chiangmai",
@@ -59,7 +57,6 @@ export const FESTIVAL_EVENTS: FestivalEvent[] = [
     category: "lantern",
     lat: 18.7883,
     lng: 98.9853,
-    mapUrl: "https://maps.google.com/?q=วัดสันป่าตอง เชียงใหม่",
   },
   {
     id: "tak",
@@ -73,7 +70,6 @@ export const FESTIVAL_EVENTS: FestivalEvent[] = [
     category: "river",
     lat: 16.8811,
     lng: 99.1215,
-    mapUrl: "https://maps.google.com/?q=สวนสาธารณะสมเด็จพระศรีนครินทร์ ตาก",
   },
   {
     id: "ayutthaya",
@@ -87,22 +83,16 @@ export const FESTIVAL_EVENTS: FestivalEvent[] = [
     category: "historical",
     lat: 14.3532,
     lng: 100.5776,
-    mapUrl: "https://maps.google.com/?q=วัดไชยวัฒนา อยุธยา",
   },
 ];
+
+export const FESTIVAL_EVENTS: FestivalEvent[] = EVENTS.map((e) => ({
+  ...e,
+  mapUrl: `https://www.google.com/maps/search/?api=1&query=${e.lat},${e.lng}`,
+}));
 
 export const CATEGORY_LABELS: Record<EventCategory, string> = {
   river: "ริมแม่น้ำ",
   historical: "เมืองประวัติศาสตร์",
   lantern: "คู่กับยี่เป็ง",
-  sea: "ริมทะเล",
-};
-
-export const FESTIVAL_DETAILS = {
-  name: "Loy Kratong Festival 2026",
-  date: FESTIVAL_DATE,
-  dateDisplay: FESTIVAL_DATE_DISPLAY,
-  tagline: "คืนวันเพ็ญเดือน 12 ขอบคุณแม่น้ำ ลอยสิ่งไม่ดีออกไปกับสายน้ำ",
-  description:
-    "เว็บไซต์รวบรวมข้อมูลวันและจุดลอยกระทงสำคัญทั่วประเทศ ประวัติของประเพณี วิธีทำกระทง และคำอธิษฐานที่คนนิยมใช้ในคืนลอยกระทง",
 };
