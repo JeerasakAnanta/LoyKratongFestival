@@ -1,3 +1,6 @@
+import { createElement } from "react";
+import type { KratongDesign } from "@/lib/kratong/design";
+
 /** ตัดข้อความเป็นบรรทัดตามความกว้าง (ภาษาไทยไม่มีเว้นวรรค จึงตัดทีละตัวอักษร) */
 export function wrapText(
   measure: (s: string) => number,
@@ -23,8 +26,20 @@ export function wrapText(
   return lines;
 }
 
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("โหลดภาพกระทงไม่สำเร็จ"));
+    img.src = src;
+  });
+}
+
 /** วาดการ์ดคำอธิษฐานเป็นภาพ PNG (data URL) สำหรับบันทึกหรือแชร์ */
-export function renderWishCard(emoji: string, wish: string): string | null {
+export async function renderWishCard(
+  design: KratongDesign,
+  wish: string,
+): Promise<string | null> {
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
   canvas.height = 1080;
@@ -38,16 +53,28 @@ export function renderWishCard(emoji: string, wish: string): string | null {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1080);
 
+  // react-dom/server โหลดตอนกดบันทึกเท่านั้น เพื่อไม่ให้หนักหน้าเว็บตอนเปิด
+  const [{ renderToStaticMarkup }, { default: KratongView }] =
+    await Promise.all([
+      import("react-dom/server"),
+      import("@/components/KratongView"),
+    ]);
+  const svg = renderToStaticMarkup(
+    createElement(KratongView, { design, size: 360 }),
+  );
+  const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  try {
+    ctx.drawImage(await loadImage(url), 360, 120, 360, 396);
+  } catch {
+    // วาดกระทงไม่ได้ก็ยังบันทึกการ์ดข้อความต่อไป
+  }
+
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-  ctx.font = "200px sans-serif";
-  ctx.fillText(emoji, 540, 340);
-
   ctx.fillStyle = "#f2c46d";
-  const font = "44px 'Noto Sans Thai', sans-serif";
-  ctx.font = font;
+  ctx.font = "44px 'Noto Sans Thai', sans-serif";
   const lines = wrapText((s) => ctx.measureText(s).width, wish, 820).slice(0, 6);
-  lines.forEach((l, i) => ctx.fillText(l, 540, 520 + i * 68));
+  lines.forEach((l, i) => ctx.fillText(l, 540, 620 + i * 66));
 
   ctx.fillStyle = "#ffffff99";
   ctx.font = "32px 'Noto Sans Thai', sans-serif";

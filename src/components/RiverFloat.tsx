@@ -2,19 +2,20 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { renderWishCard } from "@/lib/kratong-image";
-
-const STYLES = [
-  { id: "lotus", emoji: "🪷", label: "ดอกบัว" },
-  { id: "leaf", emoji: "🍃", label: "ใบตอง" },
-  { id: "marigold", emoji: "🏵️", label: "ดาวเรือง" },
-] as const;
+import {
+  DEFAULT_DESIGN,
+  sanitizeDesign,
+  type KratongDesign,
+} from "@/lib/kratong/design";
+import KratongEditor from "./KratongEditor";
+import KratongView from "./KratongView";
 
 const MAX_WISH = 120;
 const MAX_ON_RIVER = 12;
 
 interface Floating {
   id: number;
-  emoji: string;
+  design: KratongDesign;
   wish: string;
   top: number;
   rest: number;
@@ -24,7 +25,7 @@ interface Floating {
   offset: number;
 }
 
-const STORAGE_KEY = "kratong-river-v1";
+const STORAGE_KEY = "kratong-river-v2";
 
 let nextId = 0;
 
@@ -38,13 +39,14 @@ function loadSaved(now: number): Floating[] {
       .filter(
         (i) =>
           typeof i?.wish === "string" &&
-          typeof i.emoji === "string" &&
+          typeof i.design === "object" &&
           typeof i.startedAt === "number" &&
           typeof i.duration === "number" &&
           i.startedAt + i.duration * 1000 > now,
       )
       .map((i) => ({
         ...i,
+        design: sanitizeDesign(i.design),
         offset: Math.max(0, Math.round((now - i.startedAt) / 100) / 10),
       }));
   } catch {
@@ -60,16 +62,16 @@ function save(items: Floating[]) {
   }
 }
 
-export default function RiverFloat() {
+export default function RiverFloat({ level = 99 }: { level?: number }) {
   const [wish, setWish] = useState("");
-  const [style, setStyle] = useState<(typeof STYLES)[number]["id"]>("lotus");
+  const [design, setDesign] = useState<KratongDesign>(DEFAULT_DESIGN);
   const [items, setItems] = useState<Floating[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
   const [announce, setAnnounce] = useState("");
   const wishRef = useRef<HTMLTextAreaElement>(null);
   const timers = useRef<number[]>([]);
 
-  const [last, setLast] = useState<{ emoji: string; wish: string } | null>(
+  const [last, setLast] = useState<{ design: KratongDesign; wish: string } | null>(
     null,
   );
   const [hydrated, setHydrated] = useState(false);
@@ -96,9 +98,9 @@ export default function RiverFloat() {
     if (hydrated) save(items);
   }, [items, hydrated]);
 
-  function saveImage() {
+  async function saveImage() {
     if (!last) return;
-    const url = renderWishCard(last.emoji, last.wish);
+    const url = await renderWishCard(last.design, last.wish);
     if (!url) return;
     const a = document.createElement("a");
     a.href = url;
@@ -110,10 +112,10 @@ export default function RiverFloat() {
     e.preventDefault();
     const text = wish.trim();
     if (!text) return;
-    const emoji = STYLES.find((s) => s.id === style)!.emoji;
+    const snapshot = sanitizeDesign(design);
     const item: Floating = {
       id: nextId++,
-      emoji,
+      design: snapshot,
       wish: text,
       top: 35 + Math.random() * 45,
       rest: 5 + Math.random() * 60,
@@ -122,7 +124,7 @@ export default function RiverFloat() {
       offset: 0,
     };
     setItems((prev) => [...prev.slice(-(MAX_ON_RIVER - 1)), item]);
-    setLast({ emoji, wish: text });
+    setLast({ design: snapshot, wish: text });
     setWish("");
     setAnnounce(`ลอยกระทงแล้ว: ${text}`);
     wishRef.current?.focus();
@@ -145,36 +147,7 @@ export default function RiverFloat() {
         onSubmit={release}
         className="space-y-4 card p-5"
       >
-        <fieldset>
-          <legend className="mb-2 text-sm font-medium text-gold">
-            เลือกกระทง
-          </legend>
-          <div className="flex gap-2">
-            {STYLES.map((s) => (
-              <label
-                key={s.id}
-                className={`flex-1 cursor-pointer rounded-xl border px-2 py-3 text-center text-sm transition ${
-                  style === s.id
-                    ? "border-gold bg-gold/10 text-white"
-                    : "border-white/10 text-gray-300 hover:bg-white/5"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="style"
-                  value={s.id}
-                  checked={style === s.id}
-                  onChange={() => setStyle(s.id)}
-                  className="sr-only"
-                />
-                <span className="block text-2xl" aria-hidden="true">
-                  {s.emoji}
-                </span>
-                {s.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <KratongEditor design={design} onChange={setDesign} level={level} />
 
         <div>
           <label
@@ -262,11 +235,8 @@ export default function RiverFloat() {
               onBlur={() => setActiveId(null)}
               className="river-bob pointer-events-auto relative inline-block w-24 rounded-lg text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
             >
-              <span className="river-flame absolute -top-1 left-1/2 -translate-x-1/2 text-lg" aria-hidden="true">
-                🔥
-              </span>
-              <span className="block text-5xl" aria-hidden="true">
-                {it.emoji}
+              <span className="mx-auto block h-16 w-14" aria-hidden="true">
+                <KratongView design={it.design} />
               </span>
               <span
                 aria-hidden="true"

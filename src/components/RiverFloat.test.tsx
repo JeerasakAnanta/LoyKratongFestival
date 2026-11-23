@@ -37,9 +37,9 @@ describe("RiverFloat", () => {
 
   it("ไม่โหลดกระทงที่ลอยพ้นไปแล้ว", () => {
     window.localStorage.setItem(
-      "kratong-river-v1",
+      "kratong-river-v2",
       JSON.stringify([
-        { id: 1, emoji: "🪷", wish: "หมดเวลา", top: 40, rest: 10, duration: 20, startedAt: Date.now() - 60_000 },
+        { id: 1, design: { base: "leaf", flowers: [], color: "gold", decor: [], candle: "single" }, wish: "หมดเวลา", top: 40, rest: 10, duration: 20, startedAt: Date.now() - 60_000 },
       ]),
     );
     render(<RiverFloat />);
