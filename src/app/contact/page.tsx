@@ -24,10 +24,10 @@ export default function ContactPage() {
           <li>
             อีเมล:{" "}
             <a
-              href="mailto:hello@loykratong.example"
+              href="mailto:jeerasakananta@gmail.com"
               className="text-gold underline-offset-4 hover:underline"
             >
-              hello@loykratong.example
+              jeerasakananta@gmail.com
             </a>
           </li>
           <li>เวลาตอบข้อความ: จันทร์ถึงศุกร์ 09:00 น. ถึง 18:00 น.</li>

@@ -33,8 +33,15 @@ export default function RiverFloat() {
 
   useEffect(() => {
     const pending = timers.current;
-    return () => pending.forEach(window.clearTimeout);
+    return () => pending.forEach((t) => window.clearTimeout(t));
   }, []);
+
+  useEffect(() => {
+    if (activeId === null) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setActiveId(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeId]);
 
   function release(e: FormEvent) {
     e.preventDefault();
@@ -51,7 +58,8 @@ export default function RiverFloat() {
     };
     setItems((prev) => [...prev.slice(-(MAX_ON_RIVER - 1)), item]);
     setWish("");
-    setAnnounce(`ลอยกระทงแล้ว: ${text}`);
+    // ต่อ zero-width space สลับกัน เพื่อให้ screen reader ประกาศซ้ำเมื่อคำอธิษฐานเหมือนเดิม
+    setAnnounce((prev) => `ลอยกระทงแล้ว: ${text}${prev.endsWith("\u200b") ? "" : "\u200b"}`);
     wishRef.current?.focus();
     // ลบด้วย timer แทน onAnimationEnd เพราะโหมดลดการเคลื่อนไหวปิด animation
     timers.current.push(
@@ -60,6 +68,10 @@ export default function RiverFloat() {
   }
 
   function remove(id: number) {
+    // กระทงที่ถือโฟกัสอยู่หายไป ให้โฟกัสกลับช่องคำอธิษฐานแทนที่จะหลุดไป body
+    if (document.activeElement?.getAttribute("data-kratong") === String(id)) {
+      wishRef.current?.focus();
+    }
     setItems((prev) => prev.filter((i) => i.id !== id));
     setActiveId((cur) => (cur === id ? null : cur));
   }
@@ -137,7 +149,6 @@ export default function RiverFloat() {
       <div
         role="region"
         aria-label="แม่น้ำจำลอง"
-        onKeyDown={(e) => e.key === "Escape" && setActiveId(null)}
         className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#120d33] via-[#1c1245] to-[#0b1a33]"
       >
         <div
@@ -175,7 +186,8 @@ export default function RiverFloat() {
           >
             <div
               tabIndex={0}
-              role="group"
+              role="img"
+              data-kratong={it.id}
               aria-label={`กระทง คำอธิษฐาน: ${it.wish}`}
               onMouseEnter={() => setActiveId(it.id)}
               onMouseLeave={() => setActiveId(null)}

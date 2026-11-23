@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import { FESTIVAL_DATE_DISPLAY } from "@/lib/festival-data";
 import "@/styles/globals.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 const sans = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
   variable: "--font-sans",
@@ -18,6 +20,7 @@ const serif = Noto_Serif_Thai({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "ลอยกระทง 2026 · Loy Kratong Festival",
     template: "%s · ลอยกระทง 2026",
@@ -67,8 +70,6 @@ export default function RootLayout({
   return (
     <html lang="th" className={`${sans.variable} ${serif.variable}`}>
       <head>
-        <meta charSet="utf-8" />
-        <link rel="icon" href="/favicon.ico" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -77,6 +78,7 @@ export default function RootLayout({
               "@type": "Event",
               name: "ลอยกระทง 2569 (Loy Kratong Festival 2026)",
               startDate: "2026-11-24",
+              endDate: "2026-11-24",
               eventStatus: "https://schema.org/EventScheduled",
               eventAttendanceMode:
                 "https://schema.org/OfflineEventAttendanceMode",
@@ -84,16 +86,25 @@ export default function RootLayout({
                 "ประเพณีลอยกระทง คืนวันเพ็ญเดือน 12 ของทุกปี " +
                 FESTIVAL_DATE_DISPLAY,
               location: {
-                "@type": "Country",
+                "@type": "Place",
                 name: "ประเทศไทย",
+                address: { "@type": "PostalAddress", addressCountry: "TH" },
               },
             }),
           }}
         />
       </head>
       <body className="flex min-h-screen flex-col bg-night font-sans text-gray-100 antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:text-night"
+        >
+          ข้ามไปยังเนื้อหา
+        </a>
         <Navbar />
-        {children}
+        <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none">
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

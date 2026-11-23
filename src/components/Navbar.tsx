@@ -30,7 +30,8 @@ export default function Navbar() {
 
         <ul className="flex flex-wrap items-center gap-1">
           {NAV_LINKS.map((link) => {
-            const active = pathname === link.href;
+            const active =
+              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
             return (
               <li key={link.href}>
                 <Link
