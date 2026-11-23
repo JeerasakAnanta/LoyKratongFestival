@@ -3,9 +3,8 @@ import { Noto_Sans_Thai, Noto_Serif_Thai } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FESTIVAL_DATE_DISPLAY } from "@/lib/festival-data";
+import { SITE_URL } from "@/lib/site";
 import "@/styles/globals.css";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 const sans = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s · ลอยกระทง 2026",
   },
   description:
-    "รวมวันและจุดลอยกระทงสำคัญทั่วไทย ประวัติประเพณี วิธีทำกระทง และคำอธิษฐาน ปีนี้ลอยกระทงวันที่ 24 พฤศจิกายน 2026",
+    "รวมวันและจุดลอยกระทงสำคัญทั่วไทย ประวัติประเพณี วิธีทำกระทง และคำอธิษฐาน ลอยกระทงปี 2026 ตรงกับวันที่ 24 พฤศจิกายน",
   keywords: [
     "ลอยกระทง",
     "ประเพณีไทย",
@@ -42,9 +41,11 @@ export const metadata: Metadata = {
     type: "website",
     locale: "th_TH",
     siteName: "Loy Kratong Festival 2026",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ลอยกระทง 2026" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: ["/og-image.png"],
     title: "ลอยกระทง 2026 · Loy Kratong Festival",
     description:
       "รวมวันและจุดลอยกระทงสำคัญทั่วไทย ประวัติประเพณี วิธีทำกระทง และคำอธิษฐาน",

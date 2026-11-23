@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FESTIVAL_EVENTS } from "@/lib/festival-data";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "ติดต่อ",
@@ -21,15 +22,19 @@ export default function ContactPage() {
       <section className="mb-10 card p-6">
         <h2 className="section-title mb-3">ช่องทางติดต่อ</h2>
         <ul className="space-y-2 text-gray-300">
-          <li>
-            อีเมล:{" "}
-            <a
-              href="mailto:jeerasakananta@gmail.com"
-              className="text-gold underline-offset-4 hover:underline"
-            >
-              jeerasakananta@gmail.com
-            </a>
-          </li>
+          {CONTACT_EMAIL ? (
+            <li>
+              อีเมล:{" "}
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-gold underline-offset-4 hover:underline"
+              >
+                {CONTACT_EMAIL}
+              </a>
+            </li>
+          ) : (
+            <li>ช่องทางติดต่อกำลังเตรียมเปิด</li>
+          )}
           <li>เวลาตอบข้อความ: จันทร์ถึงศุกร์ 09:00 น. ถึง 18:00 น.</li>
         </ul>
         <p className="mt-4 text-sm leading-relaxed text-gray-400">
