@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { renderWishCard } from "@/lib/kratong-image";
 
 const STYLES = [
   { id: "lotus", emoji: "🪷", label: "ดอกบัว" },
@@ -18,9 +19,46 @@ interface Floating {
   top: number;
   rest: number;
   duration: number;
+  startedAt: number;
+  /** วินาทีที่ลอยไปแล้วตอนโหลดกลับมา (0 สำหรับกระทงที่เพิ่งลอย) ใช้เดินแอนิเมชันต่อจากเดิม */
+  offset: number;
 }
 
+const STORAGE_KEY = "kratong-river-v1";
+
 let nextId = 0;
+
+function loadSaved(now: number): Floating[] {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const list = JSON.parse(raw) as Floating[];
+    if (!Array.isArray(list)) return [];
+    return list
+      .filter(
+        (i) =>
+          typeof i?.wish === "string" &&
+          typeof i.emoji === "string" &&
+          typeof i.startedAt === "number" &&
+          typeof i.duration === "number" &&
+          i.startedAt + i.duration * 1000 > now,
+      )
+      .map((i) => ({
+        ...i,
+        offset: Math.max(0, Math.round((now - i.startedAt) / 100) / 10),
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function save(items: Floating[]) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // localStorage ใช้ไม่ได้ (โหมดส่วนตัว ฯลฯ) ก็ข้ามไป
+  }
+}
 
 export default function RiverFloat() {
   const [wish, setWish] = useState("");
@@ -31,17 +69,42 @@ export default function RiverFloat() {
   const wishRef = useRef<HTMLTextAreaElement>(null);
   const timers = useRef<number[]>([]);
 
+  const [last, setLast] = useState<{ emoji: string; wish: string } | null>(
+    null,
+  );
+  const [hydrated, setHydrated] = useState(false);
+
   useEffect(() => {
     const pending = timers.current;
-    return () => pending.forEach((t) => window.clearTimeout(t));
+    const now = Date.now();
+    const saved = loadSaved(now);
+    saved.forEach((it) => {
+      nextId = Math.max(nextId, it.id + 1);
+      pending.push(
+        window.setTimeout(
+          () => remove(it.id),
+          it.startedAt + it.duration * 1000 - now,
+        ),
+      );
+    });
+    setItems(saved);
+    setHydrated(true);
+    return () => pending.forEach(window.clearTimeout);
   }, []);
 
   useEffect(() => {
-    if (activeId === null) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setActiveId(null);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [activeId]);
+    if (hydrated) save(items);
+  }, [items, hydrated]);
+
+  function saveImage() {
+    if (!last) return;
+    const url = renderWishCard(last.emoji, last.wish);
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "kratong-wish.png";
+    a.click();
+  }
 
   function release(e: FormEvent) {
     e.preventDefault();
@@ -55,11 +118,13 @@ export default function RiverFloat() {
       top: 35 + Math.random() * 45,
       rest: 5 + Math.random() * 60,
       duration: 22 + Math.random() * 10,
+      startedAt: Date.now(),
+      offset: 0,
     };
     setItems((prev) => [...prev.slice(-(MAX_ON_RIVER - 1)), item]);
+    setLast({ emoji, wish: text });
     setWish("");
-    // ต่อ zero-width space สลับกัน เพื่อให้ screen reader ประกาศซ้ำเมื่อคำอธิษฐานเหมือนเดิม
-    setAnnounce((prev) => `ลอยกระทงแล้ว: ${text}${prev.endsWith("\u200b") ? "" : "\u200b"}`);
+    setAnnounce(`ลอยกระทงแล้ว: ${text}`);
     wishRef.current?.focus();
     // ลบด้วย timer แทน onAnimationEnd เพราะโหมดลดการเคลื่อนไหวปิด animation
     timers.current.push(
@@ -68,10 +133,6 @@ export default function RiverFloat() {
   }
 
   function remove(id: number) {
-    // กระทงที่ถือโฟกัสอยู่หายไป ให้โฟกัสกลับช่องคำอธิษฐานแทนที่จะหลุดไป body
-    if (document.activeElement?.getAttribute("data-kratong") === String(id)) {
-      wishRef.current?.focus();
-    }
     setItems((prev) => prev.filter((i) => i.id !== id));
     setActiveId((cur) => (cur === id ? null : cur));
   }
@@ -132,7 +193,7 @@ export default function RiverFloat() {
             placeholder="ขอให้ปีหน้าสุขภาพแข็งแรง..."
             className="w-full resize-none rounded-xl border border-white/10 bg-night p-3 text-white placeholder:text-gray-500 focus:border-gold focus:outline-none"
           />
-          <p className="mt-1 text-right text-xs text-gray-300">
+          <p className="mt-1 text-right text-xs text-gray-400">
             {wish.length}/{MAX_WISH}
           </p>
         </div>
@@ -144,11 +205,17 @@ export default function RiverFloat() {
         >
           ลอยกระทง
         </button>
+        {last && (
+          <button type="button" onClick={saveImage} className="btn-ghost w-full">
+            บันทึกคำอธิษฐานล่าสุดเป็นภาพ
+          </button>
+        )}
       </form>
 
       <div
         role="region"
         aria-label="แม่น้ำจำลอง"
+        onKeyDown={(e) => e.key === "Escape" && setActiveId(null)}
         className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#120d33] via-[#1c1245] to-[#0b1a33]"
       >
         <div
@@ -181,15 +248,13 @@ export default function RiverFloat() {
                 top: `${it.top}%`,
                 "--dur": `${it.duration}s`,
                 "--rest": `${it.rest}%`,
-                // หยุดลอยเมื่อชี้หรือโฟกัส เพื่อให้อ่านคำอธิษฐานทัน (ไม่ใช้ :has() เพราะเบราว์เซอร์เก่าไม่รองรับ)
-                animationPlayState: it.id === activeId ? "paused" : "running",
+                animationDelay: `-${it.offset}s`,
               } as React.CSSProperties
             }
           >
             <div
               tabIndex={0}
-              role="img"
-              data-kratong={it.id}
+              role="group"
               aria-label={`กระทง คำอธิษฐาน: ${it.wish}`}
               onMouseEnter={() => setActiveId(it.id)}
               onMouseLeave={() => setActiveId(null)}
