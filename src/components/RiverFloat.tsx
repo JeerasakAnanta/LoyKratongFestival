@@ -161,6 +161,10 @@ export default function RiverFloat() {
   }, []);
 
   const removeItem = useCallback((id: number) => {
+    // กระทงที่ถือโฟกัสอยู่หายไป ให้โฟกัสกลับช่องคำอธิษฐานแทนที่จะหลุดไป body
+    if (document.activeElement?.getAttribute("data-kratong") === String(id)) {
+      wishRef.current?.focus();
+    }
     setItems((prev) => prev.filter((i) => i.id !== id));
     setActiveId((cur) => (cur === id ? null : cur));
   }, []);
@@ -268,12 +272,19 @@ export default function RiverFloat() {
     return () => {
       cancelled = true;
       window.clearInterval(poll);
-      pending.forEach(window.clearTimeout);
+      pending.forEach((t) => window.clearTimeout(t));
       window.clearTimeout(first);
       window.clearInterval(litterTimer);
       window.clearInterval(ambientTimer);
     };
   }, [removeItem, spawnOther, spawnLitter]);
+
+  useEffect(() => {
+    if (activeId === null) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setActiveId(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeId]);
 
   useEffect(() => {
     if (hydrated) save(items);
@@ -292,7 +303,8 @@ export default function RiverFloat() {
     }
     const text = parts.join(" · ");
     setToast(text);
-    setAnnounce(text);
+    // ต่อ zero-width space สลับกัน เพื่อให้ screen reader ประกาศซ้ำเมื่อข้อความเหมือนเดิม
+    setAnnounce((prev) => `${text}${prev.endsWith("​") ? "" : "​"}`);
     later(() => setToast((cur) => (cur === text ? "" : cur)), 5000);
     if (soundRef.current) playTones(gain.levelUp !== null ? SFX.levelUp : sfx);
     return gain;
@@ -444,7 +456,7 @@ export default function RiverFloat() {
             placeholder="ขอให้ปีหน้าสุขภาพแข็งแรง..."
             className="w-full resize-none rounded-xl border border-white/10 bg-night p-3 text-white placeholder:text-gray-500 focus:border-gold focus:outline-none"
           />
-          <p className="mt-1 text-right text-xs text-gray-400">
+          <p className="mt-1 text-right text-xs text-gray-300">
             {wish.length}/{MAX_WISH}
           </p>
         </div>
@@ -487,7 +499,6 @@ export default function RiverFloat() {
           ref={riverRef}
           role="region"
           aria-label="แม่น้ำจำลอง"
-          onKeyDown={(e) => e.key === "Escape" && setActiveId(null)}
           className="relative h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#120d33] via-[#1c1245] to-[#0b1a33]"
         >
           <div
@@ -545,11 +556,14 @@ export default function RiverFloat() {
                   "--dur": `${it.duration}s`,
                   "--rest": `${it.rest}%`,
                   animationDelay: `-${it.offset}s`,
+                  // หยุดลอยเมื่อชี้หรือโฟกัส เพื่อให้อ่านคำอธิษฐานทัน (ไม่ใช้ :has() เพราะเบราว์เซอร์เก่าไม่รองรับ)
+                  animationPlayState: it.id === activeId ? "paused" : "running",
                 } as React.CSSProperties
               }
             >
               <div
                 tabIndex={0}
+                data-kratong={it.id}
                 role={it.mine ? "group" : "button"}
                 aria-label={
                   it.mine
