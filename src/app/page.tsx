@@ -1,5 +1,5 @@
 import Link from "next/link";
-import RiverFloat from "@/components/RiverFloat";
+import KratongView from "@/components/KratongView";
 import FestivalCountdown from "@/components/FestivalCountdown";
 import RiverScene from "@/components/RiverScene";
 import {
@@ -7,6 +7,12 @@ import {
   FESTIVAL_EVENTS,
   CATEGORY_LABELS,
 } from "@/lib/festival-data";
+
+const SAMPLE_DESIGNS = [
+  { base: "lotus", flowers: ["lotus", "marigold"], color: "pink", decor: ["sparkle"], candle: "single" },
+  { base: "leaf", flowers: ["marigold", "orchid", "jasmine"], color: "gold", decor: ["ribbon"], candle: "triple" },
+  { base: "coconut", flowers: ["rose"], color: "blue", decor: ["bird"], candle: "single" },
+];
 
 const TIPS = [
   {
@@ -78,21 +84,25 @@ export default function Home() {
 
       {/* ลอยกระทงออนไลน์ */}
       <section className="mx-auto max-w-6xl px-4 py-14">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-          <div>
+        <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:text-left">
+          <div className="flex shrink-0 gap-2" aria-hidden="true">
+            {SAMPLE_DESIGNS.map((d, i) => (
+              <div key={i} className="h-24 w-20">
+                <KratongView design={d} />
+              </div>
+            ))}
+          </div>
+          <div className="flex-1">
             <h2 className="section-title">ลอยกระทงออนไลน์</h2>
-            <p className="mt-2 text-gray-300">
-              เขียนคำอธิษฐาน เลือกกระทง แล้วปล่อยให้ลอยไปตามสายน้ำ
+            <p className="mt-2 leading-relaxed text-gray-300">
+              ออกแบบกระทงของคุณเอง เขียนคำอธิษฐาน แล้วลอยไปในแม่น้ำ
+              เก็บขยะ อนุโมทนากระทงคนอื่น สะสมแต้มบุญปลดล็อกชิ้นส่วนใหม่
             </p>
           </div>
-          <Link
-            href="/float"
-            className="text-sm text-gold underline-offset-4 hover:underline"
-          >
-            เปิดเต็มหน้า
+          <Link href="/float" className="btn-gold shrink-0">
+            เริ่มลอยกระทง
           </Link>
         </div>
-        <RiverFloat />
       </section>
 
       {/* จุดลอยเด่น */}

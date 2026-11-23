@@ -16,6 +16,14 @@ import {
   type KratongDesign,
 } from "@/lib/kratong/design";
 import { makeAmbient } from "@/lib/game/ambient";
+import {
+  fetchRiver,
+  isOwn,
+  postKratong,
+  rememberOwn,
+  sendReaction,
+  type RemoteKratong,
+} from "@/lib/river-api";
 import { levelFor } from "@/lib/game/levels";
 import type { GameEvent, Gain } from "@/lib/game/progress";
 import {
@@ -32,6 +40,8 @@ import KratongView from "./KratongView";
 const MAX_WISH = 120;
 const MAX_MINE = 12;
 const MAX_AMBIENT = 3;
+const MAX_REMOTE = 8;
+const POLL_MS = 15000;
 const MAX_LITTER = 4;
 const LITTER_EMOJI = ["🥤", "🛍️", "🥫", "🍾"];
 const COMBO_WINDOW_MS = 3500;
@@ -49,6 +59,8 @@ interface Floating {
   /** วินาทีที่ลอยไปแล้วตอนโหลดกลับมา (0 สำหรับกระทงที่เพิ่งลอย) ใช้เดินแอนิเมชันต่อจากเดิม */
   offset: number;
   blessed?: boolean;
+  /** id ในแม่น้ำกลาง (ถ้ามี) */
+  serverId?: string;
 }
 
 interface Litter {
@@ -88,6 +100,7 @@ function loadSaved(now: number): Floating[] {
       .map((i) => ({
         ...i,
         mine: true,
+        serverId: typeof i.serverId === "string" ? i.serverId : undefined,
         design: sanitizeDesign(i.design),
         offset: Math.max(0, Math.round((now - i.startedAt) / 100) / 10),
       }));
@@ -123,6 +136,10 @@ export default function RiverFloat() {
     null,
   );
   const [hydrated, setHydrated] = useState(false);
+  const [shared, setShared] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [viewed, setViewed] = useState<{ id: string; wish: string } | null>(null);
 
   const { progress, dispatch } = useProgress();
   const level = levelFor(progress.merit);
@@ -133,6 +150,11 @@ export default function RiverFloat() {
   const comboRef = useRef({ count: 0, at: 0 });
   const soundRef = useRef(false);
   soundRef.current = soundOn;
+  const sharedRef = useRef(false);
+  sharedRef.current = shared;
+  const itemsRef = useRef<Floating[]>([]);
+  itemsRef.current = items;
+  const poolRef = useRef<RemoteKratong[]>([]);
 
   const later = useCallback((fn: () => void, ms: number) => {
     timers.current.push(window.setTimeout(fn, ms));
@@ -161,6 +183,38 @@ export default function RiverFloat() {
     );
     later(() => removeItem(item.id), item.duration * 1000);
   }, [later, removeItem]);
+
+  const floatRemote = useCallback(
+    (r: RemoteKratong) => {
+      const duration = 28 + Math.random() * 8;
+      // ให้ลอยโผล่กลางแม่น้ำเลย ไม่ต้องรอเริ่มจากริมซ้าย
+      const elapsed = Math.random() * duration * 0.5;
+      const item: Floating = {
+        id: nextId++,
+        mine: false,
+        serverId: r.id,
+        design: r.design,
+        wish: r.wish,
+        top: 35 + Math.random() * 45,
+        rest: 5 + Math.random() * 60,
+        duration,
+        startedAt: Date.now() - elapsed * 1000,
+        offset: Math.round(elapsed * 10) / 10,
+      };
+      setItems((prev) => [...prev, item]);
+      later(() => removeItem(item.id), (duration - elapsed) * 1000);
+    },
+    [later, removeItem],
+  );
+
+  // ลอยกระทงของผู้อื่น: จากแม่น้ำกลางถ้าเชื่อมอยู่ ไม่งั้นใช้ข้อความตัวอย่าง
+  const spawnOther = useCallback(() => {
+    if (!sharedRef.current) return spawnAmbient();
+    const onRiver = new Set(itemsRef.current.map((i) => i.serverId));
+    if (itemsRef.current.filter((i) => !i.mine).length >= MAX_REMOTE) return;
+    const free = poolRef.current.filter((r) => !onRiver.has(r.id) && !isOwn(r.id));
+    if (free.length) floatRemote(free[Math.floor(Math.random() * free.length)]);
+  }, [floatRemote, spawnAmbient]);
 
   const spawnLitter = useCallback(() => {
     const it: Litter = {
@@ -195,16 +249,31 @@ export default function RiverFloat() {
     const tick = (fn: () => void) => () => {
       if (document.visibilityState === "visible") fn();
     };
-    const first = window.setTimeout(tick(spawnAmbient), 1500);
+    let cancelled = false;
+    const load = async () => {
+      const r = await fetchRiver();
+      if (cancelled || !r) return;
+      poolRef.current = r.items;
+      if (r.enabled) {
+        setShared(true);
+        sharedRef.current = true;
+        spawnOther();
+      }
+    };
+    void load();
+    const poll = window.setInterval(tick(() => void load()), POLL_MS);
+    const first = window.setTimeout(tick(spawnOther), 1500);
     const litterTimer = window.setInterval(tick(spawnLitter), 4500);
-    const ambientTimer = window.setInterval(tick(spawnAmbient), 12000);
+    const ambientTimer = window.setInterval(tick(spawnOther), 7000);
     return () => {
+      cancelled = true;
+      window.clearInterval(poll);
       pending.forEach(window.clearTimeout);
       window.clearTimeout(first);
       window.clearInterval(litterTimer);
       window.clearInterval(ambientTimer);
     };
-  }, [removeItem, spawnAmbient, spawnLitter]);
+  }, [removeItem, spawnOther, spawnLitter]);
 
   useEffect(() => {
     if (hydrated) save(items);
@@ -260,6 +329,24 @@ export default function RiverFloat() {
     setItems((prev) => prev.map((i) => (i.id === it.id ? { ...i, blessed: true } : i)));
     const gain = award({ type: "bless" }, SFX.bless);
     pop(e, `🙏 +${gain.merit}`);
+    if (it.serverId) void sendReaction(it.serverId, "bless");
+  }
+
+  function view(it: Floating) {
+    setActiveId(it.id);
+    if (it.serverId && !it.mine) setViewed({ id: it.serverId, wish: it.wish });
+  }
+
+  async function report() {
+    if (!viewed) return;
+    const { id } = viewed;
+    setViewed(null);
+    poolRef.current = poolRef.current.filter((r) => r.id !== id);
+    setItems((prev) => prev.filter((i) => i.serverId !== id));
+    const ok = await sendReaction(id, "report");
+    const msg = ok ? "ขอบคุณ ส่งรายงานแล้ว" : "ส่งรายงานไม่สำเร็จ ลองใหม่อีกครั้ง";
+    setToast(msg);
+    later(() => setToast((cur) => (cur === msg ? "" : cur)), 4000);
   }
 
   async function saveImage() {
@@ -279,14 +366,38 @@ export default function RiverFloat() {
     if (next) playTones(SFX.bless);
   }
 
-  function release(e: FormEvent) {
+  async function release(e: FormEvent) {
     e.preventDefault();
     const text = wish.trim();
-    if (!text) return;
+    if (!text || submitting) return;
     const snapshot = sanitizeDesign(design);
+    setFormError("");
+
+    let serverId: string | undefined;
+    if (sharedRef.current) {
+      setSubmitting(true);
+      const r = await postKratong(snapshot, text);
+      setSubmitting(false);
+      if (r.ok) {
+        serverId = r.item.id;
+        rememberOwn(r.item.id);
+      } else if (r.error === "profanity") {
+        return setFormError("คำอธิษฐานมีคำที่ไม่เหมาะสม ลองปรับข้อความแล้วลอยอีกครั้ง");
+      } else if (r.error === "contact") {
+        return setFormError("ห้ามใส่ลิงก์ อีเมล หรือเบอร์โทรในคำอธิษฐาน");
+      } else if (r.error === "rate-limit") {
+        return setFormError("ลอยถี่เกินไป รอสักครู่แล้วลองใหม่นะ");
+      } else if (r.error === "bad-request") {
+        return setFormError("คำอธิษฐานต้องไม่ว่างและยาวไม่เกิน 120 ตัวอักษร");
+      } else {
+        // ต่อแม่น้ำกลางไม่ได้ ยังลอยในเครื่องได้ตามปกติ
+        setFormError("ต่อแม่น้ำกลางไม่ได้ กระทงใบนี้จะลอยเฉพาะในเครื่องคุณ");
+      }
+    }
     const item: Floating = {
       id: nextId++,
       mine: true,
+      serverId,
       design: snapshot,
       wish: text,
       top: 35 + Math.random() * 45,
@@ -338,12 +449,23 @@ export default function RiverFloat() {
           </p>
         </div>
 
+        {shared && (
+          <p className="text-xs leading-relaxed text-gray-400">
+            คำอธิษฐานจะแสดงให้ผู้เล่นคนอื่นเห็นในแม่น้ำกลางนาน 24 ชั่วโมง
+            กรุณาอย่าใส่ชื่อจริง เบอร์โทร หรือข้อมูลส่วนตัว
+          </p>
+        )}
+        {formError && (
+          <p role="alert" className="text-sm text-rose-300">
+            {formError}
+          </p>
+        )}
         <button
           type="submit"
-          disabled={!wish.trim()}
+          disabled={!wish.trim() || submitting}
           className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-40"
         >
-          ลอยกระทง
+          {submitting ? "กำลังลอย..." : "ลอยกระทง"}
         </button>
         {last && (
           <button type="button" onClick={saveImage} className="btn-ghost w-full">
@@ -445,9 +567,9 @@ export default function RiverFloat() {
                         }
                       }
                 }
-                onMouseEnter={() => setActiveId(it.id)}
+                onMouseEnter={() => view(it)}
                 onMouseLeave={() => setActiveId(null)}
-                onFocus={() => setActiveId(it.id)}
+                onFocus={() => view(it)}
                 onBlur={() => setActiveId(null)}
                 className={`river-bob pointer-events-auto relative inline-block w-24 rounded-lg text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold ${
                   it.mine ? "" : "cursor-pointer opacity-90"
@@ -488,8 +610,22 @@ export default function RiverFloat() {
         <p className="text-xs text-gray-400">
           เคล็ดลับ: กดขยะในแม่น้ำเพื่อเก็บ (ยิ่งเก็บติดกันยิ่งได้คอมโบ)
           และกดกระทงของผู้อื่นเพื่ออนุโมทนา
-          กระทงตัวอย่างของ &ldquo;เพื่อนร่วมแม่น้ำ&rdquo; ยังเป็นข้อความสมมติ
+          {!shared &&
+            " · ตอนนี้ยังไม่ได้ต่อแม่น้ำกลาง กระทงของเพื่อนร่วมแม่น้ำเป็นข้อความสมมติ"}
         </p>
+        {viewed && (
+          <p className="text-xs text-gray-400">
+            เห็นข้อความไม่เหมาะสม?{" "}
+            <button
+              type="button"
+              onClick={report}
+              className="text-rose-300 underline underline-offset-2 hover:text-rose-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold"
+            >
+              รายงานกระทง “{viewed.wish.slice(0, 24)}
+              {viewed.wish.length > 24 ? "…" : ""}”
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
