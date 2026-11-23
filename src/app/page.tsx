@@ -1,5 +1,6 @@
 import Link from "next/link";
 import RiverFloat from "@/components/RiverFloat";
+import FestivalCountdown from "@/components/FestivalCountdown";
 import RiverScene from "@/components/RiverScene";
 import {
   FESTIVAL_DATE_DISPLAY,
@@ -37,9 +38,10 @@ export default function Home() {
           aria-hidden="true"
         />
         <div className="relative z-10 mx-auto max-w-6xl px-4 pb-6 pt-16 text-center sm:pt-24">
-          <p className="mb-6 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm text-gold">
+          <p className="mb-3 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm text-gold">
             {FESTIVAL_DATE_DISPLAY}
           </p>
+          <FestivalCountdown />
           <h1 className="font-serif text-5xl font-bold leading-tight text-white sm:text-7xl">
             ลอยกระทง 2569
           </h1>
@@ -167,7 +169,7 @@ export default function Home() {
             บทอธิษฐานก่อนลอยกระทง
           </h2>
           <blockquote className="mx-auto max-w-2xl italic leading-loose text-gold/90">
-            &ldquo;ข้าวบูชาพระแม่คงคา เทวดาประจำลำน้ำ
+            &ldquo;ข้าพเจ้าขอบูชาพระแม่คงคา เทวดาประจำลำน้ำ
             ที่ได้บำรุงชีวิตข้าพเจ้าตลอดฤดูกาล
             ขอให้ข้าพเจ้าและครอบครัวมีความสุขความเจริญ
             ทุกข์โทษโรคภัยทั้งหลายจงลอยไปกับกระทงนี้&rdquo;

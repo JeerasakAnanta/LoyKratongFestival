@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "จุดลอยกระทง 2026",
   description:
-    "รวมจุดลอยกระทงสำคัญปี 2026 ทั้งกรุงเทพฯ สุโขทัย เชียงใหม่ ตาก และอยุธยา พร้อมพิกัดและสิ่งที่ต้องรู้ก่อนไป",
+    "รวมจุดลอยกระทงสำคัญปี 2026 ทั้งกรุงเทพฯ สุโขทัย เชียงใหม่ ตาก อยุธยา ภูเก็ต พัทยา และขอนแก่น พร้อมพิกัดและสิ่งที่ต้องรู้ก่อนไป",
 };
 
 export default function EventsPage() {
@@ -20,7 +20,7 @@ export default function EventsPage() {
           จุดลอยกระทงทั่วไทย
         </h1>
         <p className="mt-3 max-w-2xl leading-relaxed text-gray-300">
-          ปีนี้ลอยกระทง{FESTIVAL_DATE_DISPLAY} เลือกจุดลอยใกล้บ้าน
+          ลอยกระทงปี 2026 ตรงกับ{FESTIVAL_DATE_DISPLAY} เลือกจุดลอยใกล้บ้าน
           หรือขับไปเที่ยวงานใหญ่ประจำจังหวัด แต่ละที่มีเอกลักษณ์ไม่เหมือนกัน
         </p>
       </header>
@@ -55,6 +55,11 @@ export default function EventsPage() {
             <p className="mt-4 leading-relaxed text-gray-300">
               {event.description}
             </p>
+            {event.verifyDates && (
+              <p className="mt-2 text-sm text-gold/80">
+                ⚠ กำหนดการอาจเปลี่ยนแปลง ตรวจสอบกับผู้จัดงานก่อนเดินทาง
+              </p>
+            )}
 
             <div className="mt-5 flex flex-wrap gap-3">
               <a
