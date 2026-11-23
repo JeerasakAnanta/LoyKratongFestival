@@ -152,3 +152,10 @@ export function randomDesign(
     candle: one(CANDLES),
   };
 }
+
+/** ชิ้นส่วนที่เพิ่งปลดล็อกพอดีที่เลเวลนี้ (ใช้แจ้งตอนเลเวลอัป) */
+export function unlockedAt(level: number): Part[] {
+  return [...BASES, ...FLOWERS, ...COLORS, ...CANDLES, ...DECORS].filter(
+    (p) => p.unlock === level,
+  );
+}

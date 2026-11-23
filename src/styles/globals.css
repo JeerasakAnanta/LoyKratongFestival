@@ -82,6 +82,12 @@
 }
 /* ชี้หรือโฟกัสกระทงแล้วหยุดลอย เพื่อให้อ่านคำอธิษฐานได้ทัน */
 .river-drift:has(.river-bob:hover, .river-bob:focus) { animation-play-state: paused; }
+@keyframes river-pop {
+  from { transform: translateY(0) scale(0.8); opacity: 1; }
+  to { transform: translateY(-36px) scale(1.15); opacity: 0; }
+}
+@keyframes river-pop-fade { from { opacity: 1; } to { opacity: 0; } }
+.river-pop { animation: river-pop 1s ease-out forwards; }
 @keyframes kr-flame {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.12, 0.92); opacity: 0.85; }
@@ -89,6 +95,7 @@
 .kr-flame { transform-box: fill-box; transform-origin: 50% 100%; animation: kr-flame 0.9s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
   .kr-flame { animation: none; }
+  .river-pop { animation: river-pop-fade 1s ease-out forwards; }
   .river-bob, .river-flame, .river-wave { animation: none; }
   .river-drift {
     animation: river-fade var(--dur, 25s) linear forwards;
