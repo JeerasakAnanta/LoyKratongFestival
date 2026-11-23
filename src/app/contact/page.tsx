@@ -19,7 +19,7 @@ export default function ContactPage() {
       </header>
 
       <section className="mb-10 card p-6">
-        <h2 className="mb-3 font-serif text-xl font-bold text-white">ช่องทางติดต่อ</h2>
+        <h2 className="section-title mb-3">ช่องทางติดต่อ</h2>
         <ul className="space-y-2 text-gray-300">
           <li>
             อีเมล:{" "}
@@ -40,7 +40,7 @@ export default function ContactPage() {
       </section>
 
       <section>
-        <h2 className="mb-6 font-serif text-xl font-bold text-white">
+        <h2 className="section-title mb-6">
           สรุปพิกัดจุดลอยกระทง
         </h2>
         <div className="overflow-x-auto rounded-2xl border border-white/10">

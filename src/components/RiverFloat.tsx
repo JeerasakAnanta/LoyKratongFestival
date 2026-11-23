@@ -132,7 +132,7 @@ export default function RiverFloat() {
             placeholder="ขอให้ปีหน้าสุขภาพแข็งแรง..."
             className="w-full resize-none rounded-xl border border-white/10 bg-night p-3 text-white placeholder:text-gray-500 focus:border-gold focus:outline-none"
           />
-          <p className="mt-1 text-right text-xs text-gray-400">
+          <p className="mt-1 text-right text-xs text-gray-300">
             {wish.length}/{MAX_WISH}
           </p>
         </div>
@@ -181,6 +181,8 @@ export default function RiverFloat() {
                 top: `${it.top}%`,
                 "--dur": `${it.duration}s`,
                 "--rest": `${it.rest}%`,
+                // หยุดลอยเมื่อชี้หรือโฟกัส เพื่อให้อ่านคำอธิษฐานทัน (ไม่ใช้ :has() เพราะเบราว์เซอร์เก่าไม่รองรับ)
+                animationPlayState: it.id === activeId ? "paused" : "running",
               } as React.CSSProperties
             }
           >

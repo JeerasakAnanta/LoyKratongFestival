@@ -1,4 +1,4 @@
-export type EventCategory = "river" | "historical" | "lantern" | "sea";
+export type EventCategory = "river" | "historical" | "lantern";
 
 export interface FestivalEvent {
   id: string;
@@ -95,14 +95,4 @@ export const CATEGORY_LABELS: Record<EventCategory, string> = {
   river: "ริมแม่น้ำ",
   historical: "เมืองประวัติศาสตร์",
   lantern: "คู่กับยี่เป็ง",
-  sea: "ริมทะเล",
-};
-
-export const FESTIVAL_DETAILS = {
-  name: "Loy Kratong Festival 2026",
-  date: FESTIVAL_DATE,
-  dateDisplay: FESTIVAL_DATE_DISPLAY,
-  tagline: "คืนวันเพ็ญเดือน 12 ขอบคุณแม่น้ำ ลอยสิ่งไม่ดีออกไปกับสายน้ำ",
-  description:
-    "เว็บไซต์รวบรวมข้อมูลวันและจุดลอยกระทงสำคัญทั่วประเทศ ประวัติของประเพณี วิธีทำกระทง และคำอธิษฐานที่คนนิยมใช้ในคืนลอยกระทง",
 };
